@@ -493,7 +493,7 @@ Use this exact structure:
 Note: If the quote text is readable in the screenshot, you can either:
 1. Use the actual image URL if visible
 2. Create a placeholder with the quote text
-3. Replace with a text-based quote block if preferred.
+3. Replace with a text-based quote block if preferred
 
 �📤 OUTPUT:
 Return JSON: { "html": "..." }
