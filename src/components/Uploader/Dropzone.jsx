@@ -18,8 +18,12 @@ const Uploader = ({ onGenerate }) => {
     };
 
     const processFile = async (file) => {
-        if (!file || !file.type.startsWith('image/')) {
-            alert('Please upload an image file.');
+        if (!file) return;
+
+        console.log("Processing file:", file.name, file.type);
+
+        if (!file.type.startsWith('image/')) {
+            alert(`Please upload an image file. (Detected type: ${file.type || 'unknown'})`);
             return;
         }
 
