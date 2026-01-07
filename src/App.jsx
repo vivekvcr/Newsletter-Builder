@@ -4,18 +4,24 @@ import MainLayout from './components/Layout/MainLayout';
 import Dropzone from './components/Uploader/Dropzone';
 import EmailFrame from './components/Preview/EmailFrame';
 import StyleGuide from './components/Preview/StyleGuide';
-import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage, FaDownload, FaFileCode, FaMagic } from 'react-icons/fa';
+import PropertiesPanel from './components/Builder/PropertiesPanel';
+import BlockSidebar from './components/Builder/BlockSidebar';
+import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage, FaDownload, FaFileCode, FaMagic, FaTools } from 'react-icons/fa';
 
 function App() {
   const [view, setView] = useState('upload'); // 'upload' | 'preview'
   const [data, setData] = useState({ html: '', meta: { colors: [], fonts: [] } });
   const [sourceImage, setSourceImage] = useState(null);
-  const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile' | 'code' | 'ai'
+  const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile' | 'code' | 'ai' | 'builder'
   const [showSource, setShowSource] = useState(false);
 
   // AI Edit State
   const [isAiProcessing, setIsAiProcessing] = useState(false);
   const [aiInstruction, setAiInstruction] = useState('');
+
+  // Builder State
+  const [selection, setSelection] = useState(null); // { id, styles, tagName }
+  const [styleUpdate, setStyleUpdate] = useState(null); // { id, styles: {} }
 
   const handleGenerate = (result, imageBase64) => {
     setData(result);
@@ -131,6 +137,13 @@ function App() {
               >
                 <FaMagic /> AI Edit
               </button>
+              <button
+                className={`btn-secondary ${previewMode === 'builder' ? 'active' : ''}`}
+                onClick={() => setPreviewMode('builder')}
+                style={{ background: previewMode === 'builder' ? 'var(--bg-app)' : 'transparent' }}
+              >
+                <FaTools /> Builder
+              </button>
               <div style={{ width: '1px', height: '20px', background: 'var(--border-color)', margin: '0 var(--spacing-2)' }} />
               <button onClick={downloadHtml} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaDownload /> Export HTML
@@ -186,6 +199,31 @@ function App() {
                   >
                     {isAiProcessing ? 'Thinking...' : 'Apply AI'}
                   </button>
+                </div>
+              </div>
+            ) : previewMode === 'builder' ? (
+              <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+                {selection ? (
+                  <PropertiesPanel
+                    styles={selection.styles}
+                    onClose={() => setSelection(null)}
+                    onChange={(key, value) => {
+                      const newStyles = { ...selection.styles, [key]: value };
+                      setSelection({ ...selection, styles: newStyles });
+                      setStyleUpdate({ id: selection.id, styles: { [key]: value } });
+                    }}
+                  />
+                ) : (
+                  <BlockSidebar />
+                )}
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <EmailFrame
+                    html={data.html}
+                    mode="desktop"
+                    onUpdate={(newHtml) => setData(prev => ({ ...prev, html: newHtml }))}
+                    onSelect={(data) => setSelection(data)}
+                    styleUpdates={styleUpdate}
+                  />
                 </div>
               </div>
             ) : (
