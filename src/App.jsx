@@ -3,7 +3,7 @@ import MainLayout from './components/Layout/MainLayout';
 import Dropzone from './components/Uploader/Dropzone';
 import EmailFrame from './components/Preview/EmailFrame';
 import StyleGuide from './components/Preview/StyleGuide';
-import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage } from 'react-icons/fa';
+import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage, FaDownload, FaFileCode } from 'react-icons/fa';
 
 function App() {
   const [view, setView] = useState('upload'); // 'upload' | 'preview'
@@ -94,13 +94,36 @@ function App() {
               >
                 <FaMobileAlt /> Mobile
               </button>
+              <button
+                className={`btn-secondary ${previewMode === 'code' ? 'active' : ''}`}
+                onClick={() => setPreviewMode('code')}
+                style={{ background: previewMode === 'code' ? 'var(--bg-app)' : 'transparent' }}
+              >
+                <FaFileCode /> Source
+              </button>
               <div style={{ width: '1px', height: '20px', background: 'var(--border-color)', margin: '0 var(--spacing-2)' }} />
               <button onClick={downloadHtml} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FaCode /> Export HTML
+                <FaDownload /> Export HTML
               </button>
             </div>
 
-            <EmailFrame html={data.html} mode={previewMode} />
+            {previewMode === 'code' ? (
+              <div style={{
+                flex: 1,
+                background: '#282c34',
+                padding: '24px',
+                overflow: 'auto',
+                color: '#abb2bf',
+                fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                fontSize: '14px',
+                lineHeight: '1.5',
+                whiteSpace: 'pre'
+              }}>
+                {data.html}
+              </div>
+            ) : (
+              <EmailFrame html={data.html} mode={previewMode} onUpdate={(newHtml) => setData(prev => ({ ...prev, html: newHtml }))} />
+            )}
           </div>
 
           {/* Style Guide Panel */}
