@@ -51,8 +51,8 @@ Map the content from the screenshot onto the specific structure of the Reference
         /* Utility classes */
         .w-100 { width: 100% !important; }
         .stack { display: block !important; width: 100% !important; }
-        .p-24 { padding: 24px !important; }
-        .px-24 { padding-left: 24px !important; padding-right: 24px !important; }
+        .p-24 { padding-top: 24px !important; padding-bottom: 24px !important; padding-left: 30px !important; padding-right: 30px !important; }
+        .px-24 { padding-left: 30px !important; padding-right: 30px !important; }
         .center-m { text-align: center !important; }
         
         /* Heading adjustments for mobile */
@@ -326,6 +326,8 @@ Map the content from the screenshot onto the specific structure of the Reference
 - **Body Images**:
   - If the screenshot contains images in the MAIN BODY (excluding Header/Footer logos), REPLACE them with: https://placehold.co/600x200
   - Ensure image style is: width:100%; height:auto; display:block;
+- **Standard Padding**:
+  - Content sections MUST use **30px** left and right padding (e.g., \`padding: 40px 30px;\`).
 
 � **SECTION SPACING RULES**:
 - Each major section MUST be in a separate \`< tr >\` element
