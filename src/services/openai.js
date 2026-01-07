@@ -530,3 +530,57 @@ Return JSON: { "html": "..." }
     throw error;
   }
 };
+
+export const modifyEmailCode = async (currentHtml, instruction) => {
+  // Escape backticks and template literal syntax in currentHtml to prevent errors
+  const safeHtml = currentHtml.replace(/`/g, '\\`').replace(/\$\{/g, '\\${');
+
+  const prompt = `
+You are an expert HTML email developer.
+
+I am providing:
+1. The current valid HTML code of an email newsletter.
+2. A specific user instruction to modify it.
+
+Current HTML:
+\`\`\`html
+${safeHtml}
+\`\`\`
+
+User Instruction:
+"${instruction}"
+
+Your Task:
+- Implement the requested change in the HTML.
+- Return the FULL, COMPLETE, valid HTML document (do not truncate).
+- Maintain existing structure and styling unless asked to change.
+
+IMPORTANT:
+- Return ONLY a valid JSON object.
+- The JSON must have a single key "html" containing the full HTML string.
+
+Return JSON: { "html": "..." }
+`;
+
+  try {
+    console.log("Sending AI Edit Request...", { instruction });
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const content = response.choices[0].message.content;
+    const json = JSON.parse(content);
+    console.log("AI Edit Success");
+    return json.html;
+  } catch (error) {
+    console.error("Error modifying email:", error);
+    throw error;
+  }
+};

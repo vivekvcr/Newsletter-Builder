@@ -99,7 +99,6 @@ const EmailFrame = ({ html, mode = 'desktop', onUpdate }) => {
                 style={{
                     width: width,
                     height: '100%',
-                    minHeight: '800px',
                     border: 'none',
                     background: 'white',
                     boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',

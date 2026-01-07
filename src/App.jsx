@@ -1,16 +1,21 @@
 import { useState } from 'react';
+import { generateEmailCode, modifyEmailCode } from './services/openai';
 import MainLayout from './components/Layout/MainLayout';
 import Dropzone from './components/Uploader/Dropzone';
 import EmailFrame from './components/Preview/EmailFrame';
 import StyleGuide from './components/Preview/StyleGuide';
-import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage, FaDownload, FaFileCode } from 'react-icons/fa';
+import { FaMobileAlt, FaDesktop, FaCode, FaArrowLeft, FaImage, FaDownload, FaFileCode, FaMagic } from 'react-icons/fa';
 
 function App() {
   const [view, setView] = useState('upload'); // 'upload' | 'preview'
   const [data, setData] = useState({ html: '', meta: { colors: [], fonts: [] } });
   const [sourceImage, setSourceImage] = useState(null);
-  const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile'
+  const [previewMode, setPreviewMode] = useState('desktop'); // 'desktop' | 'mobile' | 'code' | 'ai'
   const [showSource, setShowSource] = useState(false);
+
+  // AI Edit State
+  const [isAiProcessing, setIsAiProcessing] = useState(false);
+  const [aiInstruction, setAiInstruction] = useState('');
 
   const handleGenerate = (result, imageBase64) => {
     setData(result);
@@ -22,6 +27,24 @@ function App() {
     setView('upload');
     setData({ html: '', meta: { colors: [], fonts: [] } });
     setSourceImage(null);
+    setAiInstruction('');
+  };
+
+  const handleAiEdit = async () => {
+    if (!aiInstruction.trim()) return;
+
+    setIsAiProcessing(true);
+    try {
+      const newHtml = await modifyEmailCode(data.html, aiInstruction);
+      setData(prev => ({ ...prev, html: newHtml }));
+      setAiInstruction('');
+      alert('AI edits applied successfully!');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to apply AI edits. Check console for details.');
+    } finally {
+      setIsAiProcessing(false);
+    }
   };
 
   const downloadHtml = () => {
@@ -101,6 +124,13 @@ function App() {
               >
                 <FaFileCode /> Source
               </button>
+              <button
+                className={`btn-secondary ${previewMode === 'ai' ? 'active' : ''}`}
+                onClick={() => setPreviewMode('ai')}
+                style={{ background: previewMode === 'ai' ? 'var(--bg-app)' : 'transparent', color: 'var(--color-primary)' }}
+              >
+                <FaMagic /> AI Edit
+              </button>
               <div style={{ width: '1px', height: '20px', background: 'var(--border-color)', margin: '0 var(--spacing-2)' }} />
               <button onClick={downloadHtml} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <FaDownload /> Export HTML
@@ -120,6 +150,43 @@ function App() {
                 whiteSpace: 'pre'
               }}>
                 {data.html}
+              </div>
+            ) : previewMode === 'ai' ? (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <EmailFrame html={data.html} mode="desktop" />
+                <div style={{
+                  height: '120px',
+                  borderTop: '1px solid var(--border-color)',
+                  background: '#fff',
+                  padding: '20px',
+                  display: 'flex',
+                  gap: '12px',
+                  alignItems: 'start'
+                }}>
+                  <textarea
+                    value={aiInstruction}
+                    onChange={(e) => setAiInstruction(e.target.value)}
+                    placeholder="Enter instructions (e.g., 'Make the header update background blue', 'Change the main image to...')"
+                    style={{
+                      flex: 1,
+                      height: '100%',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #ccc',
+                      resize: 'none',
+                      fontFamily: 'inherit'
+                    }}
+                    disabled={isAiProcessing}
+                  />
+                  <button
+                    onClick={handleAiEdit}
+                    className="btn-primary"
+                    disabled={isAiProcessing || !aiInstruction.trim()}
+                    style={{ height: '100%', minWidth: '100px' }}
+                  >
+                    {isAiProcessing ? 'Thinking...' : 'Apply AI'}
+                  </button>
+                </div>
               </div>
             ) : (
               <EmailFrame html={data.html} mode={previewMode} onUpdate={(newHtml) => setData(prev => ({ ...prev, html: newHtml }))} />
