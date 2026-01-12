@@ -151,19 +151,26 @@ function App() {
             </div>
 
             {previewMode === 'code' ? (
-              <div style={{
-                flex: 1,
-                background: '#282c34',
-                padding: '24px',
-                overflow: 'auto',
-                color: '#abb2bf',
-                fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
-                fontSize: '14px',
-                lineHeight: '1.5',
-                whiteSpace: 'pre'
-              }}>
-                {data.html}
-              </div>
+              <textarea
+                value={data.html}
+                onChange={(e) => setData(prev => ({ ...prev, html: e.target.value }))}
+                spellCheck="false"
+                style={{
+                  flex: 1,
+                  width: '100%',
+                  height: '100%',
+                  background: '#282c34',
+                  padding: '24px',
+                  border: 'none',
+                  outline: 'none',
+                  resize: 'none',
+                  color: '#abb2bf',
+                  fontFamily: 'Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace',
+                  fontSize: '14px',
+                  lineHeight: '1.5',
+                  whiteSpace: 'pre'
+                }}
+              />
             ) : previewMode === 'ai' ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 <EmailFrame html={data.html} mode="desktop" />
