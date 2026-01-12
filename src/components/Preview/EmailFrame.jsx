@@ -44,10 +44,16 @@ const EmailFrame = ({ html, mode = 'desktop', onUpdate, styleUpdates, onSelect }
             const style = doc.createElement('style');
             style.id = 'editor-styles';
             style.textContent = `
-                body { margin: 0; padding: 0; background: #fff; font - family: sans - serif; }
+                body { margin: 0; padding: 0; background: #fff; font-family: sans-serif; }
                 :: -webkit - scrollbar { width: 0px; }
                 * [contenteditable = "true"] { outline: 2px dashed #ff6600; cursor: text; }
 img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
+                
+                td, p, h1, h2, h3, h4, h5, h6, span, div, a {
+                    word-break: break-word; /* standard */
+                    overflow-wrap: break-word;
+                    word-wrap: break-word; /* ie fallback */
+                }
 `;
             doc.head.appendChild(style);
 
@@ -260,10 +266,19 @@ img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
                     e.preventDefault();
                     e.stopPropagation();
                     const newSrc = prompt('Enter new image URL:', target.src);
+                    const newAlt = prompt('Enter image Alt Text:', target.alt);
+
+                    let changed = false;
                     if (newSrc && newSrc !== target.src) {
                         target.src = newSrc;
-                        saveChanges();
+                        changed = true;
                     }
+                    if (newAlt !== null && newAlt !== target.alt) {
+                        target.alt = newAlt;
+                        changed = true;
+                    }
+
+                    if (changed) saveChanges();
                     return;
                 }
 
@@ -283,6 +298,32 @@ img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
                     target.focus();
                     target.onblur = () => {
                         target.removeAttribute('contenteditable');
+
+                        // Auto-remove empty containers to fix spacing gaps
+                        const isEmpty = target.textContent.trim() === '' && target.querySelectorAll('img, hr, table').length === 0;
+                        if (isEmpty) {
+                            const parentTd = target.closest('td');
+
+                            // 1. Remove the empty text element itself
+                            target.remove();
+
+                            // 2. Check if the parent TD is now effectively empty (no meaningful text or media)
+                            if (parentTd) {
+                                const tdContent = parentTd.textContent.trim();
+                                const tdMedia = parentTd.querySelector('img, hr, table');
+
+                                if (tdContent === '' && !tdMedia) {
+                                    // Remove the entire row to kill the padding/spacing
+                                    const row = parentTd.closest('tr');
+                                    if (row) row.remove();
+                                }
+                            } else if (target.tagName === 'TD') {
+                                // If the target WAS the TD (direct edit), dragging the row is needed
+                                const row = target.closest('tr');
+                                if (row) row.remove();
+                            }
+                        }
+
                         saveChanges();
                     };
                 }
@@ -305,7 +346,47 @@ img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
                 }
             };
 
+            const handleKeyDown = (e) => {
+                if (e.key === 'Backspace' || e.key === 'Delete') {
+                    const target = e.target;
+                    if (target.isContentEditable) {
+                        // Check if effectively empty (or will be empty after this keypress)
+                        // Note: capturing keydown is before the change, but if it is ALREADY empty, we delete.
+                        const isEmptyInfo = target.textContent.trim() === '';
+                        // Also check if valid elements exist (img, etc)
+                        const hasMedia = target.querySelector('img, hr, table');
+
+                        if (isEmptyInfo && !hasMedia) {
+                            // If user hits backspace in an empty editable block, delete it.
+                            e.preventDefault();
+
+                            const parentTd = target.closest('td');
+
+                            // 1. Remove the empty text element itself
+                            target.remove();
+
+                            // 2. Check and remove parent TD/TR if needed
+                            if (parentTd) {
+                                const tdContent = parentTd.textContent.trim();
+                                const tdMedia = parentTd.querySelector('img, hr, table');
+
+                                if (tdContent === '' && !tdMedia) {
+                                    const row = parentTd.closest('tr');
+                                    if (row) row.remove();
+                                }
+                            } else if (target.tagName === 'TD') {
+                                const row = target.closest('tr');
+                                if (row) row.remove();
+                            }
+
+                            saveChanges();
+                        }
+                    }
+                }
+            };
+
             doc.body.addEventListener('click', handleClick);
+            doc.body.addEventListener('keydown', handleKeyDown);
             doc.body.addEventListener('dragstart', handleDragStart);
             doc.body.addEventListener('dragend', handleDragEnd);
             doc.body.addEventListener('dragover', handleDragOver);
@@ -315,6 +396,7 @@ img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
 
             return () => {
                 doc.body.removeEventListener('click', handleClick);
+                doc.body.removeEventListener('keydown', handleKeyDown);
                 doc.body.removeEventListener('dragstart', handleDragStart);
                 doc.body.removeEventListener('dragend', handleDragEnd);
                 doc.body.removeEventListener('dragover', handleDragOver);

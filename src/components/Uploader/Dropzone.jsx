@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { FaCloudUploadAlt, FaSpinner } from 'react-icons/fa';
+import { FaCloudUploadAlt } from 'react-icons/fa';
 import { fileToBase64 } from '../../utils/file-helpers';
 import { generateEmailCode } from '../../services/openai';
+import LoadingScreen from '../UI/LoadingScreen';
 
 const Uploader = ({ onGenerate }) => {
     const [isDragOver, setIsDragOver] = useState(false);
@@ -58,6 +59,7 @@ const Uploader = ({ onGenerate }) => {
             style={{
                 flex: 1,
                 display: 'flex',
+                position: 'relative', // Ensure loader is contained
                 flexDirection: 'column',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -67,7 +69,8 @@ const Uploader = ({ onGenerate }) => {
                 margin: 'var(--spacing-6)',
                 backgroundColor: isDragOver ? 'var(--bg-app)' : 'var(--bg-panel)',
                 color: 'var(--text-muted)',
-                transition: 'all 0.2s'
+                transition: 'all 0.2s',
+                overflow: 'hidden' // Clipped corners for loader
             }}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -82,13 +85,7 @@ const Uploader = ({ onGenerate }) => {
             />
 
             {loading ? (
-                <div style={{ textAlign: 'center' }}>
-                    <FaSpinner className="spin" size={48} style={{ animation: 'spin 1s linear infinite' }} />
-                    <p style={{ marginTop: 'var(--spacing-4)', fontSize: '1.2rem' }}>
-                        Analyzing layout & generating HTML...
-                    </p>
-                    <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
-                </div>
+                <LoadingScreen />
             ) : (
                 <div style={{ textAlign: 'center', cursor: 'pointer' }} onClick={() => fileInputRef.current.click()}>
                     <FaCloudUploadAlt size={64} style={{ marginBottom: 'var(--spacing-4)', color: 'var(--color-primary)' }} />
