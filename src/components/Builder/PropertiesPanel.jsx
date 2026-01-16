@@ -102,18 +102,54 @@ const PropertiesPanel = ({ styles = {}, onClose, onChange }) => {
                             </select>
                         </div>
 
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        {/* Padding Controls */}
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                 <FaArrowsAltV style={{ color: '#aaa', fontSize: '12px' }} />
                                 <span style={{ fontSize: '12px', color: '#4a5568' }}>Padding (px)</span>
                             </div>
-                            <input
-                                type="text"
-                                placeholder="e.g. 10px"
-                                value={styles.padding || ''}
-                                onChange={(e) => handleChange('padding', e.target.value)}
-                                style={{ width: '80px', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px' }}
-                            />
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ fontSize: '10px', color: '#718096', width: '12px' }}>T</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Top"
+                                        value={styles.paddingTop || ''}
+                                        onChange={(e) => handleChange('paddingTop', e.target.value)}
+                                        style={{ width: '100%', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '12px' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ fontSize: '10px', color: '#718096', width: '12px' }}>R</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Right"
+                                        value={styles.paddingRight || ''}
+                                        onChange={(e) => handleChange('paddingRight', e.target.value)}
+                                        style={{ width: '100%', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '12px' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ fontSize: '10px', color: '#718096', width: '12px' }}>B</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Bottom"
+                                        value={styles.paddingBottom || ''}
+                                        onChange={(e) => handleChange('paddingBottom', e.target.value)}
+                                        style={{ width: '100%', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '12px' }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                    <span style={{ fontSize: '10px', color: '#718096', width: '12px' }}>L</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Left"
+                                        value={styles.paddingLeft || ''}
+                                        onChange={(e) => handleChange('paddingLeft', e.target.value)}
+                                        style={{ width: '100%', padding: '4px', border: '1px solid #e2e8f0', borderRadius: '4px', fontSize: '12px' }}
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

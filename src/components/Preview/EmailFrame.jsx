@@ -257,7 +257,11 @@ img:hover { outline: 2px dashed #ff6600; cursor: pointer; }
                         fontSize: target.style.fontSize || '',
                         lineHeight: target.style.lineHeight || '',
                         fontWeight: target.style.fontWeight || '',
-                        padding: target.style.padding || ''
+                        padding: target.style.padding || '',
+                        paddingTop: target.style.paddingTop || '',
+                        paddingRight: target.style.paddingRight || '',
+                        paddingBottom: target.style.paddingBottom || '',
+                        paddingLeft: target.style.paddingLeft || ''
                     };
                     onSelectRef.current({ id: selectedId, styles, tagName: target.tagName });
                 }
